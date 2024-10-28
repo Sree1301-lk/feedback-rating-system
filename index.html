@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback rating system</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="profile">
+            <img src="images/profile.png" alt="Profile Image" class="profile-image">
+            <span class="profile-name">John Doe</span>
+        </div>
+        <ul class="navbar-menu">
+            <li><a href="#my-profile">My Profile</a></li>
+            <li class="active"><a href="#my-orders">My Orders</a></li>
+            <li><a href="#my-reviews">My Reviews</a></li>
+            <li><a href="#address">Address</a></li>
+            <li><a href="#payment-details">Payment Details</a></li>
+            <li><a href="#dashboard">Dashboard</a></li>
+            <li><a href="#change-password">Change Password</a></li>
+        </ul>
+    </nav>
+    <div class="content">
+        <div class="order-details">
+            <div class="order-header">
+                <h2>Order Details</h2>
+                <div class="btn-container">
+                    <button class="btn">Download PDF</button>
+                    <button class="btn" id="writeReviewBtn">Write Review</button>
+                </div>
+            </div>
+            <div class="order-info">
+                <p><strong>Order ID:</strong> #12345</p>
+                <p><strong>Ordered On:</strong> July 20, 2024</p>
+            </div>
+            <div class="order-body">
+                <div class="product-summary">
+                    <div class="product-info">
+                        <img src="images/camera.jpeg" alt="Product Image" class="product-image">
+                        <div class="product-details">
+                            <p><strong>Product Name:</strong> Awesome Product</p>
+                            <p><strong>Quantity:</strong> 2</p>
+                            <p><strong>Price:</strong> $50</p>
+                            <button class="btn view-product">View Product</button>
+                        </div>
+                    </div>
+                    <div class="order-summary">
+                        <h3>Order Summary</h3>
+                        <table>
+                            <tr><td>Subtotal:</td><td>$100</td></tr>
+                            <tr><td>Tax:</td><td>$10</td></tr>
+                            <tr><td>Deliery Charges:</td><td>$5</td></tr>
+                            <tr><td><strong>Amount to be Paid:</strong></td><td><strong>$115</strong></td></tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="address-payment">
+                    <div class="address">
+                        <h3>Billing Address</h3>
+                        <p>123 Main Street, Apt 4B, Anytown, USA</p>
+                        <p>Zip Code: 12345</p>
+                        <p>Country: USA</p>
+                        <p>State: Any State</p>
+                    </div>
+                    <div class="address">
+                        <h3>Shipping Address</h3>
+                        <p>456 Another Avenue, Suite 10, Othertown, USA</p>
+                        <p>Zip Code: 67890</p>
+                        <p>Country: USA</p>
+                        <p>State: Other State</p>
+                    </div>
+                    <div class="payment-methods">
+                        <h3>Payment Methods</h3>
+                        <div class="payment-method">
+                            <p><strong>Card Type:</strong> Visa</p>
+                            <p><strong>Card Details:</strong> **** **** **** 1234</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="btn return-order">Return Order</button>
+        </div>
+    </div>
+    <div id="reviewModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Select Rating Type</h2>
+            <button class="btn rating-btn" data-type="service">Service Rating</button>
+            <button class="btn rating-btn" data-type="product">Product Rating</button>
+            <div id="ratingForm" class="hidden">
+                <h3 id="ratingTitle">Rate the Service</h3>
+                <div class="star-rating">
+                    <input type="radio" id="star5" name="rating" value="5"/><label for="star5" title="5 stars"><i class="fa fa-star"></i></label>
+                    <input type="radio" id="star4" name="rating" value="4"/><label for="star4" title="4 stars"><i class="fa fa-star"></i></label>
+                    <input type="radio" id="star3" name="rating" value="3"/><label for="star3" title="3 stars"><i class="fa fa-star"></i></label>
+                    <input type="radio" id="star2" name="rating" value="2"/><label for="star2" title="2 stars"><i class="fa fa-star"></i></label>
+                    <input type="radio" id="star1" name="rating" value="1"/><label for="star1" title="1 star"><i class="fa fa-star"></i></label>
+                </div>
+                <textarea id="commentBox" placeholder="Enter your comments"></textarea>
+                <div class="anonymous-review">
+                    <input type="checkbox" id="anonymous">
+                    <label for="anonymous">Submit anonymously</label>
+                </div>
+                <button class="btn submit-btn" id="submitBtn">Submit</button>
+            </div>
+        </div>
+    </div>
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeSuccessModal">&times;</span>
+            <div class="success-content">
+                <p>Review submitted successfully!</p>
+                <div class="checkmark">&#10003;</div>
+            </div>
+        </div>
+    </div>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-analytics.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+      
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyDI3XtVE3LvG1jHWpcewkPa0uR0k1uEwx4",
+          authDomain: "feedback-system-5082e.firebaseapp.com",
+          projectId: "feedback-system-5082e",
+          storageBucket: "feedback-system-5082e.appspot.com",
+          messagingSenderId: "194668549690",
+          appId: "1:194668549690:web:825cb3a23fa59308c64703",
+          measurementId: "G-1X2QV5S5CK"
+        };
+      
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+      
+        // Function to add review to Firestore
+        async function addReview(rating, comment, anonymous) {
+          try {
+            await addDoc(collection(db, "reviews"), {
+              rating: rating,
+              comment: comment,
+              anonymous: anonymous,
+              timestamp: serverTimestamp()
+            });
+            console.log("Review added successfully!");
+          } catch (e) {
+            console.error("Error adding review: ", e);
+          }
+        }
+      </script>
+    
+</body>
+</html>
+</body>
+</html>
